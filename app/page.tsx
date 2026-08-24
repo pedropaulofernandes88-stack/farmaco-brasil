@@ -42,12 +42,16 @@ const municipalities: Record<string, string[]> = {
 const sources = [
   { code:'CMED-2024', name:'Anuário Estatístico do Mercado Farmacêutico 2024', owner:'Anvisa / SCMED', grain:'Brasil · princípio ativo', date:'jul/2025', href:'https://www.gov.br/anvisa/pt-br/centraisdeconteudo/publicacoes/medicamentos/cmed/' },
   { code:'RENAME-2024.2', name:'Relação Nacional de Medicamentos Essenciais', owner:'Ministério da Saúde', grain:'Brasil · apresentação', date:'2ª ed. 2025', href:'https://www.gov.br/saude/pt-br/composicao/sectics/rename' },
-  { code:'BNAFAR', name:'Base Nacional da Assistência Farmacêutica', owner:'Ministério da Saúde', grain:'Município · movimento', date:'contínua', href:'https://www.gov.br/saude/pt-br/composicao/sectics/daf/bnafar/bnafar' },
-  { code:'BPS-API', name:'Banco de Preços em Saúde', owner:'Ministério da Saúde', grain:'Compra · item CATMAT', date:'mensal', href:'https://dadosabertos.saude.gov.br/dataset/bps' },
+  { code:'BNAFAR', name:'Base Nacional da Assistência Farmacêutica', owner:'Ministério da Saúde', grain:'Município · movimento', date:'contínua', href:'https://www.gov.br/saude/pt-br/composicao/sectics/daf/bnafar' },
+  { code:'BPS-2024', name:'Registros de compras compilados 2023–2024', owner:'Ministério da Saúde', grain:'Compra · município · CATMAT', date:'ano-base 2024', href:'https://www.gov.br/saude/pt-br/acesso-a-informacao/banco-de-precos/bases-anuais-compiladas/registro-de-compras-compilados-ano-base-2023-2024/view' },
   { code:'OBM-FHIR', name:'Ontologia Brasileira de Medicamentos', owner:'Ministério da Saúde', grain:'Medicamento · terminologia', date:'versionada', href:'https://portal-obm.saude.gov.br/' },
   { code:'DCB-2026', name:'Denominações Comuns Brasileiras', owner:'Anvisa', grain:'Ingrediente · nomenclatura', date:'jul/2026', href:'https://www.gov.br/anvisa/pt-br/assuntos/farmacopeia/dcb' },
   { code:'SIGTAP', name:'Tabela de procedimentos e medicamentos SUS', owner:'DataSUS', grain:'Competência · procedimento', date:'mensal', href:'https://sigtap.datasus.gov.br/tabela-unificada/app/download.jsp' },
+  { code:'CNES', name:'Cadastro Nacional de Estabelecimentos de Saúde', owner:'Ministério da Saúde', grain:'Estabelecimento · município', date:'atualização diária', href:'https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude' },
+  { code:'PFPB-2024', name:'Balanço do Programa Farmácia Popular', owner:'Ministério da Saúde', grain:'Município · rede credenciada', date:'dez/2024', href:'https://www.gov.br/saude/pt-br/assuntos/balancos/2024/farmacia-popular/farmacia-popular/' },
+  { code:'IBGE-POP', name:'Estimativas da população', owner:'IBGE', grain:'Município · população', date:'anual', href:'https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html' },
   { code:'IBGE-MMD-2024', name:'Malha Municipal Digital 2024', owner:'IBGE', grain:'Município · geometria', date:'abr/2025', href:'https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html' },
+  { code:'PDA-MS-24/26', name:'Plano de Dados Abertos 2024–2026', owner:'Ministério da Saúde', grain:'Inventário · disponibilidade', date:'2024–2026', href:'https://bvsms.saude.gov.br/bvs/publicacoes/plano_dados_abertos_ministerio_saudeimp.pdf' },
 ];
 
 const papers = [
@@ -59,6 +63,23 @@ const papers = [
   { pmid:'35766787', year:'2022', title:'Public policy coverage and access to medicines in Brazil', finding:'Aquisições sem desembolso foram 20,5% do consumo em valor e chegaram a 33,6% entre políticas com garantia específica.', doi:'10.11606/s1518-8787.2022056003898' },
 ];
 
+const procurementDrugs = [
+  { id:'losartana', name:'Losartana potássica', dose:'50 mg · comprimido', records:85, municipalities:26, states:11, suppliers:24, quantity:'36,84 mi', median:0.05, p10:0.0371, p90:0.10, spread:'2,70×', low:'MG · R$ 0,035', high:'PI · R$ 0,10' },
+  { id:'dipirona', name:'Dipirona sódica', dose:'500 mg · comprimido', records:87, municipalities:35, states:7, suppliers:24, quantity:'13,17 mi', median:0.125, p10:0.11, p90:0.32, spread:'2,91×', low:'SP · R$ 0,110', high:'PI · R$ 0,32' },
+  { id:'metformina', name:'Metformina', dose:'500 mg · comprimido', records:62, municipalities:18, states:7, suppliers:16, quantity:'5,20 mi', median:0.13, p10:0.12, p90:0.18, spread:'1,50×', low:'PR · R$ 0,12', high:'PI · R$ 0,17' },
+  { id:'hidroclorotiazida', name:'Hidroclorotiazida', dose:'25 mg · comprimido', records:50, municipalities:19, states:9, suppliers:18, quantity:'22,69 mi', median:0.02, p10:0.0178, p90:0.06, spread:'3,37×', low:'PA · R$ 0,02', high:'PB · R$ 0,06' },
+  { id:'sinvastatina', name:'Sinvastatina', dose:'20 mg · comprimido', records:49, municipalities:19, states:8, suppliers:17, quantity:'2,66 mi', median:0.08, p10:0.06, p90:0.17, spread:'2,83×', low:'PR · R$ 0,06', high:'PI · R$ 0,23' },
+];
+
+const dataOpportunities = [
+  { priority:'P1', title:'Preço público municipal', source:'BPS + CATMAT + IBGE', value:96, readiness:92, status:'integrado', output:'Mediana, P10–P90, dispersão e concentração de fornecedores' },
+  { priority:'P1', title:'Rede de acesso', source:'CNES + Farmácia Popular', value:94, readiness:84, status:'próxima', output:'Farmácias e unidades dispensadoras por 10 mil habitantes' },
+  { priority:'P1', title:'Produção especializada', source:'SIA/SUS + SIGTAP', value:91, readiness:78, status:'próxima', output:'Procedimentos farmacêuticos e medicamentos por competência' },
+  { priority:'P2', title:'Demanda epidemiológica', source:'PNS + SINAN + SIH/SUS', value:87, readiness:76, status:'planejada', output:'Distância entre carga de doença e oferta/compra observada' },
+  { priority:'P2', title:'Mercado controlado histórico', source:'SNGPC 2014–2021', value:78, readiness:66, status:'histórica', output:'Consumo municipal de controlados e antimicrobianos' },
+  { priority:'P0', title:'Disponibilidade real', source:'BNAFAR + Hórus + DBPOPFARMA', value:100, readiness:28, status:'depende de abertura', output:'Estoque, ruptura, dispensação e continuidade do tratamento' },
+];
+
 export default function Home() {
   const [selected, setSelected] = useState('SP');
   const [metric, setMetric] = useState('vendas');
@@ -66,10 +87,12 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [municipality, setMunicipality] = useState('São Paulo');
   const [onlySus, setOnlySus] = useState(false);
+  const [procurementId, setProcurementId] = useState('losartana');
 
   const cities = municipalities[selected] || [stateNames[selected]];
   const filtered = useMemo(() => medicines.filter(m => (!onlySus || m.rename) && m.name.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))), [query, onlySus]);
   const mapTitle = metric === 'vendas' ? 'Intensidade do mercado farmacêutico' : 'Sobreposição entre vendas e Rename';
+  const procurement = procurementDrugs.find(d => d.id === procurementId) || procurementDrugs[0];
 
   function chooseState(uf: string) {
     setSelected(uf);
@@ -87,7 +110,7 @@ export default function Home() {
     <main className="shell">
       <header className="topbar" id="top">
         <a className="brand" href="#top" aria-label="Fármaco Brasil, início"><span className="brandMark">f.</span><span>Fármaco Brasil</span></a>
-        <nav aria-label="Navegação principal"><a className="active" href="#painel">Painel</a><a href="#medicamentos">Medicamentos</a><a href="#municipios">Municípios</a><a href="#metodologia">Método</a><a href="#fontes">Fontes</a></nav>
+        <nav aria-label="Navegação principal"><a className="active" href="#painel">Painel</a><a href="#medicamentos">Medicamentos</a><a href="#compras">Compras</a><a href="#evidencias">Evidências</a><a href="#metodologia">Método</a><a href="#fontes">Fontes</a></nav>
         <button className="outlineButton" onClick={exportCsv}>↓ Exportar CSV</button>
       </header>
 
@@ -137,6 +160,26 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="procurementSection" id="compras">
+        <div className="procurementHeader">
+          <div><p className="sectionLabel">COMPRAS PÚBLICAS · BPS 2024</p><h2>Quanto o setor público<br /><em>registrou pagar?</em></h2></div>
+          <p>Primeira camada municipal construída com registros oficiais do Banco de Preços em Saúde. Selecione uma apresentação comparável para explorar preço, dispersão e oferta.</p>
+        </div>
+        <div className="coverageStrip" aria-label="Cobertura do arquivo BPS 2024">
+          <div><strong>24.624</strong><span>registros válidos</span></div><div><strong>135</strong><span>municípios informantes</span></div><div><strong>18</strong><span>UFs observadas</span></div><div><strong>109</strong><span>instituições compradoras</span></div><div><strong>551</strong><span>fornecedores</span></div><div><strong>R$ 2,12 bi</strong><span>valor registrado*</span></div>
+        </div>
+        <div className="drugTabs" role="tablist" aria-label="Medicamentos com preços comparáveis">{procurementDrugs.map(drug => <button role="tab" aria-selected={drug.id === procurementId} className={drug.id === procurementId ? 'active' : ''} key={drug.id} onClick={() => setProcurementId(drug.id)}><strong>{drug.name}</strong><span>{drug.dose}</span></button>)}</div>
+        <div className="procurementExplorer">
+          <article className="priceCard">
+            <div className="priceHeading"><div><span>MEDIANA UNITÁRIA</span><strong>{procurement.median.toLocaleString('pt-BR', { style:'currency', currency:'BRL', minimumFractionDigits: procurement.median < 0.1 ? 3 : 2 })}</strong><small>{procurement.name} · {procurement.dose}</small></div><div className="spreadBadge"><span>DISPERSÃO P90/P10</span><strong>{procurement.spread}</strong></div></div>
+            <div className="rangePlot"><div className="rangeLabels"><span>P10 · {procurement.p10.toLocaleString('pt-BR', { style:'currency', currency:'BRL', minimumFractionDigits:3 })}</span><b>50% central dos preços observados</b><span>P90 · {procurement.p90.toLocaleString('pt-BR', { style:'currency', currency:'BRL', minimumFractionDigits:2 })}</span></div><div className="rangeRail"><i /><span style={{left:`${Math.max(8, Math.min(92, (procurement.median - procurement.p10) / (procurement.p90 - procurement.p10) * 100))}%`}} /></div></div>
+            <div className="stateComparison"><div><span>MENOR MEDIANA ESTADUAL</span><strong>{procurement.low}</strong></div><div><span>MAIOR MEDIANA ESTADUAL</span><strong>{procurement.high}</strong></div></div>
+          </article>
+          <aside className="purchaseFacts"><p className="sectionLabel">AMOSTRA SELECIONADA</p><div><strong>{procurement.records}</strong><span>registros de compra</span></div><div><strong>{procurement.municipalities}</strong><span>municípios</span></div><div><strong>{procurement.states}</strong><span>UFs</span></div><div><strong>{procurement.suppliers}</strong><span>fornecedores</span></div><div><strong>{procurement.quantity}</strong><span>unidades registradas</span></div></aside>
+        </div>
+        <div className="bpsCaveat"><strong>Leia antes de comparar.</strong><p>O BPS reúne registros informados pelos compradores e não cobre todos os 5.570 municípios. As medianas são não ponderadas e comparam a mesma descrição CATMAT, dose, forma e unidade. P10 e P90 reduzem o efeito de extremos; comparações estaduais exigem ao menos três registros. *O valor de R$ 2,12 bi cobre todos os produtos do arquivo, não apenas medicamentos.</p></div>
+      </section>
+
       <section className="municipalSection" id="municipios">
         <div className="municipalHeader"><div><p className="sectionLabel">CONSULTA MUNICIPAL</p><h2>Do país ao município,<br /><em>sem esconder as lacunas.</em></h2></div><div className="betaTag">CAMADA BETA · DADOS DEMONSTRATIVOS</div></div>
         <div className="municipalGrid">
@@ -157,11 +200,13 @@ export default function Home() {
           <article className="resultNode"><small>INDICADORES</small><strong>Acesso territorial</strong><p>Preço relativo, cobertura, regularidade, diversidade e equidade.</p><code>município × medicamento × mês</code></article>
         </div>
         <div className="apiMatrix">
-          <article><div><span className="liveDot" /><strong>Pronto para integrar</strong></div><h3>Banco de Preços em Saúde</h3><p>API e arquivos anuais em CSV/XML permitem calcular mediana, dispersão, compras consorciadas e preço por município.</p><a href="https://apidadosabertos.saude.gov.br/" target="_blank" rel="noreferrer">Documentação da API ↗</a></article>
+          <article><div><span className="liveDot" /><strong>Integrado nesta versão</strong></div><h3>Banco de Preços em Saúde</h3><p>O arquivo anual de 2024 já alimenta medianas, faixas P10–P90, dispersão, compradores e fornecedores.</p><a href="https://www.gov.br/saude/pt-br/acesso-a-informacao/banco-de-precos/bases-anuais-compiladas/registro-de-compras-compilados-ano-base-2023-2024/view" target="_blank" rel="noreferrer">Arquivo oficial usado ↗</a></article>
           <article><div><span className="liveDot" /><strong>Pronto para integrar</strong></div><h3>OBM em FHIR R4</h3><p>Terminologia pública e versionada para reduzir falsos pares entre sal, dose, forma farmacêutica e apresentação.</p><a href="https://terminologia.saude.gov.br/fhir/NamingSystem-BRObmCATMAT.html" target="_blank" rel="noreferrer">NamingSystem oficial ↗</a></article>
           <article><div><span className="liveDot" /><strong>Pronto para integrar</strong></div><h3>SIGTAP + SIA/SUS</h3><p>Medicamentos do componente especializado e produção ambulatorial podem ser tabulados por competência e território.</p><a href="https://sigtap.datasus.gov.br/tabela-unificada/app/download.jsp" target="_blank" rel="noreferrer">Arquivos mensais ↗</a></article>
           <article><div><span className="partialDot" /><strong>Série interrompida</strong></div><h3>SNGPC</h3><p>Venda de controlados e antimicrobianos tem recorte municipal histórico, mas a transmissão foi suspensa a partir de 2022.</p><a href="https://dados.gov.br/dados/conjuntos-dados/venda-de-medicamentos-controlados-e-antimicrobianos---medicamentos-manipulados" target="_blank" rel="noreferrer">Metadados e cobertura ↗</a></article>
         </div>
+        <div className="opportunityHeader"><div><p className="sectionLabel">MAPA DE OPORTUNIDADES</p><h3>Mais dado só vale quando<br />responde a uma decisão.</h3></div><p>Priorização por valor analítico e prontidão técnica. “Prontidão” considera abertura, granularidade, estabilidade e possibilidade de vínculo pelo código IBGE ou CATMAT.</p></div>
+        <div className="opportunityGrid">{dataOpportunities.map(item => <article key={item.title} className={`opportunityCard ${item.status === 'integrado' ? 'integrated' : ''}`}><div className="opportunityTop"><span>{item.priority}</span><small>{item.status}</small></div><h4>{item.title}</h4><code>{item.source}</code><p>{item.output}</p><div className="score"><span>Valor <b>{item.value}</b></span><i><em style={{width:`${item.value}%`}} /></i></div><div className="score readinessScore"><span>Prontidão <b>{item.readiness}</b></span><i><em style={{width:`${item.readiness}%`}} /></i></div></article>)}</div>
       </section>
 
       <section className="evidenceSection" id="evidencias">
@@ -178,7 +223,7 @@ export default function Home() {
       </section>
 
       <section className="sourcesSection" id="fontes">
-        <div className="sourcesHeading"><div><p className="sectionLabel">CATÁLOGO DE FONTES</p><h2>Auditável desde a origem.</h2></div><p>Versão do painel <strong>0.1.0 · protótipo acadêmico</strong><br />Atualizado em 24 ago 2026</p></div>
+        <div className="sourcesHeading"><div><p className="sectionLabel">CATÁLOGO DE FONTES</p><h2>Auditável desde a origem.</h2></div><p>Versão do painel <strong>0.2.0 · protótipo acadêmico</strong><br />Atualizado em 24 ago 2026</p></div>
         <div className="sourceTable"><div className="sourceHead"><span>ID</span><span>Fonte</span><span>Responsável</span><span>Granularidade</span><span>Referência</span><span /></div>{sources.map(s => <a href={s.href} target="_blank" rel="noreferrer" key={s.code}><code>{s.code}</code><strong>{s.name}</strong><span>{s.owner}</span><span>{s.grain}</span><span>{s.date}</span><b>↗</b></a>)}</div>
         <div className="auditAlert"><span>!</span><p><strong>Divergência documentada:</strong> a notícia da Anvisa informa 232 empresas, 14.586 apresentações e 1.944 princípios ativos; o PDF do Anuário informa 226, 14.185 e 1.905. O protótipo usa o PDF e mantém a divergência visível para revisão.</p></div>
       </section>
