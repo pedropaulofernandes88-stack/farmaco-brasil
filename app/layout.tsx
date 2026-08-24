@@ -6,7 +6,7 @@ const inter = Inter({ variable: '--font-inter', subsets: ['latin'] });
 const lora = Lora({ variable: '--font-lora', subsets: ['latin'], style: ['italic'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL('https://farmaco-brasil.pedropaulofernandes8.chatgpt.site'),
   title: 'Fármaco Brasil — Inteligência farmacêutica territorial',
   description: 'Mapa auditável do mercado de medicamentos e da oferta no SUS por estado e município.',
   openGraph: {
