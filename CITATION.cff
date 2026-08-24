@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Se você utilizar este software ou seus indicadores, cite o Fármaco Brasil."
+title: "Fármaco Brasil: inteligência farmacêutica territorial"
+type: software
+authors:
+  - family-names: Fernandes
+    given-names: Pedro Paulo
+version: 0.4.0
+date-released: 2026-08-24
+license: MIT
+repository-code: "https://github.com/pedropaulofernandes88-stack/farmaco-brasil"
+url: "https://farmaco-brasil.pedropaulofernandes8.chatgpt.site/"
+abstract: "Mapa acadêmico e auditável de medicamentos, compras públicas, oferta normativa no SUS, rede territorial e posições informadas de estoque no Brasil."
+keywords:
+  - saúde pública
+  - assistência farmacêutica
+  - SUS
+  - dados abertos
+  - engenharia de dados

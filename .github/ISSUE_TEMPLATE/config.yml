@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidade de segurança
+    url: https://github.com/pedropaulofernandes88-stack/farmaco-brasil/security/advisories/new
+    about: Não publique vulnerabilidades ou credenciais em uma issue.
+  - name: Aplicação publicada
+    url: https://farmaco-brasil.pedropaulofernandes8.chatgpt.site/
+    about: Consulte a versão atual do painel.

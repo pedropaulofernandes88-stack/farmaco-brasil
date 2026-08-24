@@ -1,0 +1,49 @@
+name: Nova fonte ou indicador
+description: Sugira uma fonte pública, enriquecimento ou indicador.
+title: "[Dados]: "
+labels: [data, suggestion]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: URL oficial da fonte
+      placeholder: https://...
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Órgão responsável
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Cobertura, período e granularidade
+      description: Informe unidade territorial, período, frequência e unidade de observação.
+    validations:
+      required: true
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decisão ou pergunta que o dado ajuda a responder
+    validations:
+      required: true
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Limitações conhecidas
+      description: Explique cobertura, ausências, vieses e o que não pode ser concluído.
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmações
+      options:
+        - label: A fonte é pública e citei sua origem oficial.
+          required: true
+        - label: A proposta não inclui dados pessoais ou individualizados.
+          required: true
+        - label: Entendo que a proposta é apenas uma sugestão ao mantenedor.
+          required: true

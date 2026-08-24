@@ -58,7 +58,7 @@ def download(key: str) -> Path:
     target = RAW / item["file"]
     if target.exists() and target.stat().st_size:
         return target
-    request = urllib.request.Request(item["url"], headers={"User-Agent": "FarmacoBrasil/0.3 academic-data-pipeline"})
+    request = urllib.request.Request(item["url"], headers={"User-Agent": "FarmacoBrasil/0.4 academic-data-pipeline"})
     with urllib.request.urlopen(request, timeout=180) as response, target.open("wb") as output:
         while chunk := response.read(1024 * 1024):
             output.write(chunk)

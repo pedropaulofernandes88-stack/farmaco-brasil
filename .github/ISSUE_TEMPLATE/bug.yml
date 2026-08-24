@@ -1,0 +1,42 @@
+name: Erro ou inconsistência
+description: Sugira a correção de um comportamento, indicador ou documentação.
+title: "[Erro]: "
+labels: [bug, suggestion]
+body:
+  - type: markdown
+    attributes:
+      value: Obrigado pela sugestão. Não inclua dados pessoais, credenciais ou informações clínicas identificáveis.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema observado
+      description: Descreva o comportamento e onde ele aparece.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Como reproduzir
+      description: Informe município, medicamento, filtro e sequência, sem dados pessoais.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Fonte oficial relacionada
+      placeholder: https://...
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado e justificativa
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmações
+      options:
+        - label: Esta issue é uma sugestão e não concede acesso de escrita ao projeto.
+          required: true
+        - label: Não incluí dados pessoais, segredos ou credenciais.
+          required: true
