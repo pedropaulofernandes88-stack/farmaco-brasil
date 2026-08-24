@@ -1,8 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import accessData from './data/access.json';
 
 type Medicine = { rank: number; name: string; band: string; revenueRank: number; rename: boolean; component: string };
+type AccessMunicipality = { id:string; name:string; uf:string; population:number|null; cnesPharmacies:number; cnesRate:number|null; pfpbCovered:boolean; nearestCnesKm:number|null; nearestCnesMunicipality:string|null; nearestPfpbKm:number|null; nearestPfpbMunicipality:string|null };
+type AccessRow = [string,string,string,number|null,number,number|null,boolean,number|null,string|null,number|null,string|null];
 
 const ufs = [
   ['AC', 0, 3], ['AM', 1, 2], ['RR', 2, 0], ['RO', 2, 4], ['PA', 3, 2], ['AP', 4, 0],
@@ -31,13 +34,7 @@ const medicines: Medicine[] = [
   { rank:10, name:'Sinvastatina', band:'50–100 mi', revenueRank:132, rename:true, component:'Básico / Farmácia Popular' },
 ];
 
-const municipalities: Record<string, string[]> = {
-  SP:['São Paulo','Campinas','Guarulhos','Ribeirão Preto','Sorocaba','São José dos Campos'],
-  RJ:['Rio de Janeiro','Niterói','Duque de Caxias','Nova Iguaçu','Petrópolis'],
-  MG:['Belo Horizonte','Uberlândia','Contagem','Juiz de Fora','Betim'],
-  BA:['Salvador','Feira de Santana','Vitória da Conquista','Camaçari','Itabuna'],
-  RS:['Porto Alegre','Caxias do Sul','Canoas','Pelotas','Santa Maria'],
-};
+const accessMunicipalities: AccessMunicipality[] = (accessData.municipalities as unknown as AccessRow[]).map(row => ({ id:row[0], name:row[1], uf:row[2], population:row[3], cnesPharmacies:row[4], cnesRate:row[5], pfpbCovered:row[6], nearestCnesKm:row[7], nearestCnesMunicipality:row[8], nearestPfpbKm:row[9], nearestPfpbMunicipality:row[10] }));
 
 const sources = [
   { code:'CMED-2024', name:'Anuário Estatístico do Mercado Farmacêutico 2024', owner:'Anvisa / SCMED', grain:'Brasil · princípio ativo', date:'jul/2025', href:'https://www.gov.br/anvisa/pt-br/centraisdeconteudo/publicacoes/medicamentos/cmed/' },
@@ -49,7 +46,8 @@ const sources = [
   { code:'SIGTAP', name:'Tabela de procedimentos e medicamentos SUS', owner:'DataSUS', grain:'Competência · procedimento', date:'mensal', href:'https://sigtap.datasus.gov.br/tabela-unificada/app/download.jsp' },
   { code:'CNES', name:'Cadastro Nacional de Estabelecimentos de Saúde', owner:'Ministério da Saúde', grain:'Estabelecimento · município', date:'atualização diária', href:'https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude' },
   { code:'PFPB-2024', name:'Balanço do Programa Farmácia Popular', owner:'Ministério da Saúde', grain:'Município · rede credenciada', date:'dez/2024', href:'https://www.gov.br/saude/pt-br/assuntos/balancos/2024/farmacia-popular/farmacia-popular/' },
-  { code:'IBGE-POP', name:'Estimativas da população', owner:'IBGE', grain:'Município · população', date:'anual', href:'https://www.ibge.gov.br/estatisticas/sociais/populacao/9103-estimativas-de-populacao.html' },
+  { code:'PFPB-VAGAS', name:'Municípios e vagas do credenciamento PFPB', owner:'Ministério da Saúde', grain:'Município · cobertura observada', date:'mar/2026', href:'https://www.gov.br/saude/pt-br/composicao/sectics/farmacia-popular/credenciamento/documentacao/anexo-i-lista-de-municipios_atualizada_em_06-03-2026.xlsx/view' },
+  { code:'SIDRA-6579', name:'População residente estimada', owner:'IBGE', grain:'Município · população', date:'2024', href:'https://sidra.ibge.gov.br/tabela/6579' },
   { code:'IBGE-MMD-2024', name:'Malha Municipal Digital 2024', owner:'IBGE', grain:'Município · geometria', date:'abr/2025', href:'https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html' },
   { code:'PDA-MS-24/26', name:'Plano de Dados Abertos 2024–2026', owner:'Ministério da Saúde', grain:'Inventário · disponibilidade', date:'2024–2026', href:'https://bvsms.saude.gov.br/bvs/publicacoes/plano_dados_abertos_ministerio_saudeimp.pdf' },
 ];
@@ -61,6 +59,8 @@ const papers = [
   { pmid:'36950032', year:'2023', title:'Inequalities in unmet need for health care services and medications in Brazil', finding:'Em 2019, 7,5% relataram necessidade não atendida de medicamentos, com desigualdade pró-pobres.', doi:'10.1016/j.lana.2022.100426' },
   { pmid:'35703669', year:'2022', title:'Prevalence rates and inequalities in access to medicines by SUS users', finding:'29,7% obtiveram todos os prescritos no SUS; 56,4% tiveram algum desembolso em 2019.', doi:'10.1590/0102-311XPT114721' },
   { pmid:'35766787', year:'2022', title:'Public policy coverage and access to medicines in Brazil', finding:'Aquisições sem desembolso foram 20,5% do consumo em valor e chegaram a 33,6% entre políticas com garantia específica.', doi:'10.11606/s1518-8787.2022056003898' },
+  { pmid:'39718526', year:'2026', title:'Reducing the travel burden to access specialized medicines', finding:'No Paraná, a descentralização simulada reduziu a distância média de 59,5 km para 10,8 km, justificando medir barreiras geográficas.', doi:'10.1016/j.vhri.2024.101065' },
+  { pmid:'27982382', year:'2016', title:'Access to medicines for chronic diseases: a multidimensional approach', finding:'Acessibilidade geográfica e disponibilidade são dimensões diferentes; a disponibilidade total foi 45,2% no SUS e 67,4% no PFPB.', doi:'10.1590/S1518-8787.2016050006161' },
 ];
 
 const procurementDrugs = [
@@ -73,7 +73,7 @@ const procurementDrugs = [
 
 const dataOpportunities = [
   { priority:'P1', title:'Preço público municipal', source:'BPS + CATMAT + IBGE', value:96, readiness:92, status:'integrado', output:'Mediana, P10–P90, dispersão e concentração de fornecedores' },
-  { priority:'P1', title:'Rede de acesso', source:'CNES + Farmácia Popular', value:94, readiness:84, status:'próxima', output:'Farmácias e unidades dispensadoras por 10 mil habitantes' },
+  { priority:'P1', title:'Rede de acesso', source:'CNES + Farmácia Popular + IBGE', value:94, readiness:94, status:'integrado', output:'Farmácias cadastradas, taxa por 10 mil e vazios de cobertura observada' },
   { priority:'P1', title:'Produção especializada', source:'SIA/SUS + SIGTAP', value:91, readiness:78, status:'próxima', output:'Procedimentos farmacêuticos e medicamentos por competência' },
   { priority:'P2', title:'Demanda epidemiológica', source:'PNS + SINAN + SIH/SUS', value:87, readiness:76, status:'planejada', output:'Distância entre carga de doença e oferta/compra observada' },
   { priority:'P2', title:'Mercado controlado histórico', source:'SNGPC 2014–2021', value:78, readiness:66, status:'histórica', output:'Consumo municipal de controlados e antimicrobianos' },
@@ -85,18 +85,37 @@ export default function Home() {
   const [metric, setMetric] = useState('vendas');
   const [view, setView] = useState<'map'|'rank'>('map');
   const [query, setQuery] = useState('');
-  const [municipality, setMunicipality] = useState('São Paulo');
+  const [municipalityId, setMunicipalityId] = useState('3550308');
+  const [accessQuery, setAccessQuery] = useState('');
+  const [accessView, setAccessView] = useState<'profile'|'gaps'>('profile');
+  const [gapMetric, setGapMetric] = useState<'population'|'distance'>('population');
   const [onlySus, setOnlySus] = useState(false);
   const [procurementId, setProcurementId] = useState('losartana');
 
-  const cities = municipalities[selected] || [stateNames[selected]];
+  const cities = useMemo(() => accessMunicipalities.filter(city => city.uf === selected), [selected]);
   const filtered = useMemo(() => medicines.filter(m => (!onlySus || m.rename) && m.name.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))), [query, onlySus]);
   const mapTitle = metric === 'vendas' ? 'Intensidade do mercado farmacêutico' : 'Sobreposição entre vendas e Rename';
   const procurement = procurementDrugs.find(d => d.id === procurementId) || procurementDrugs[0];
+  const selectedMunicipality = accessMunicipalities.find(city => city.id === municipalityId) || accessMunicipalities.find(city => city.uf === selected) || accessMunicipalities[0];
+  const ufAccess = accessData.ufs.find(uf => uf.uf === selected) || accessData.ufs[0];
+  const accessResults = useMemo(() => {
+    const normalized = accessQuery.trim().toLocaleLowerCase('pt-BR');
+    if (normalized.length < 2) return [];
+    return accessMunicipalities.filter(city => city.name.toLocaleLowerCase('pt-BR').includes(normalized) || city.id.includes(normalized)).slice(0, 8);
+  }, [accessQuery]);
+  const gapRanking = useMemo(() => accessMunicipalities.filter(city => !city.pfpbCovered && city.uf === selected).sort((a,b) => gapMetric === 'distance' ? (b.nearestPfpbKm || -1) - (a.nearestPfpbKm || -1) : (b.population || 0) - (a.population || 0)).slice(0, 10), [selected, gapMetric]);
+  const comparisonMax = Math.max(selectedMunicipality.cnesRate || 0, ufAccess.cnesRate, accessData.meta.cnesRate, .01);
 
   function chooseState(uf: string) {
     setSelected(uf);
-    setMunicipality((municipalities[uf] || [stateNames[uf]])[0]);
+    setMunicipalityId(accessMunicipalities.find(city => city.uf === uf)?.id || '3550308');
+  }
+
+  function chooseMunicipality(city: AccessMunicipality) {
+    setSelected(city.uf);
+    setMunicipalityId(city.id);
+    setAccessQuery('');
+    setAccessView('profile');
   }
 
   function exportCsv() {
@@ -106,11 +125,18 @@ export default function Home() {
     const a = document.createElement('a'); a.href = url; a.download = 'farmaco-brasil-ranking-2024.csv'; a.click(); URL.revokeObjectURL(url);
   }
 
+  function exportAccessCsv() {
+    const fields = ['codigo_ibge','municipio','uf','populacao_2024','farmacias_cnes_tipo_43','taxa_cnes_10mil','cobertura_pfpb_observada','distancia_pfpb_km','municipio_pfpb_mais_proximo'];
+    const row = [selectedMunicipality.id,selectedMunicipality.name,selectedMunicipality.uf,selectedMunicipality.population ?? '',selectedMunicipality.cnesPharmacies,selectedMunicipality.cnesRate ?? '',selectedMunicipality.pfpbCovered?'sim':'nao_observada',selectedMunicipality.nearestPfpbKm,selectedMunicipality.nearestPfpbMunicipality];
+    const url = URL.createObjectURL(new Blob([fields.join(';')+'\n'+row.join(';')], { type:'text/csv;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = `farmaco-brasil-acesso-${selectedMunicipality.id}.csv`; a.click(); URL.revokeObjectURL(url);
+  }
+
   return (
     <main className="shell">
       <header className="topbar" id="top">
         <a className="brand" href="#top" aria-label="Fármaco Brasil, início"><span className="brandMark">f.</span><span>Fármaco Brasil</span></a>
-        <nav aria-label="Navegação principal"><a className="active" href="#painel">Painel</a><a href="#medicamentos">Medicamentos</a><a href="#compras">Compras</a><a href="#evidencias">Evidências</a><a href="#metodologia">Método</a><a href="#fontes">Fontes</a></nav>
+        <nav aria-label="Navegação principal"><a className="active" href="#painel">Painel</a><a href="#medicamentos">Medicamentos</a><a href="#compras">Compras</a><a href="#municipios">Acesso</a><a href="#evidencias">Evidências</a><a href="#fontes">Fontes</a></nav>
         <button className="outlineButton" onClick={exportCsv}>↓ Exportar CSV</button>
       </header>
 
@@ -136,7 +162,7 @@ export default function Home() {
               <div className="legend"><span>Menor</span>{[1,2,3,4,5].map(n => <i key={n} className={`level${n}`} />)}<span>Maior</span></div>
             </> : <div className="miniRanking">{medicines.slice(0,6).map(m => <div key={m.rank}><span>{String(m.rank).padStart(2,'0')}</span><strong>{m.name}</strong><i style={{width:`${98 - m.rank*7}%`}}/><small>{m.band}</small></div>)}</div>}
           </div>
-          <div className="selectionCard"><div><span>UF SELECIONADA</span><strong>{stateNames[selected]} · {selected}</strong></div><div><span>STATUS TERRITORIAL</span><strong>{municipalities[selected]?'Municípios demonstrativos':'Aguardando integração municipal'}</strong></div><button onClick={() => document.getElementById('municipios')?.scrollIntoView()}>Explorar municípios →</button></div>
+          <div className="selectionCard"><div><span>UF SELECIONADA</span><strong>{stateNames[selected]} · {selected}</strong></div><div><span>STATUS TERRITORIAL</span><strong>{cities.length} municípios com camada de acesso</strong></div><button onClick={() => document.getElementById('municipios')?.scrollIntoView()}>Explorar municípios →</button></div>
         </div>
 
         <aside className="summary">
@@ -181,11 +207,28 @@ export default function Home() {
       </section>
 
       <section className="municipalSection" id="municipios">
-        <div className="municipalHeader"><div><p className="sectionLabel">CONSULTA MUNICIPAL</p><h2>Do país ao município,<br /><em>sem esconder as lacunas.</em></h2></div><div className="betaTag">CAMADA BETA · DADOS DEMONSTRATIVOS</div></div>
-        <div className="municipalGrid">
-          <aside><label>Estado<select value={selected} onChange={e => chooseState(e.target.value)}>{Object.entries(stateNames).map(([uf,name]) => <option key={uf} value={uf}>{name} · {uf}</option>)}</select></label><label>Município<select value={municipality} onChange={e => setMunicipality(e.target.value)}>{cities.map(city => <option key={city}>{city}</option>)}</select></label><div className="geoCode"><span>CÓDIGO IBGE</span><strong>{selected === 'SP' && municipality === 'São Paulo' ? '3550308' : 'a integrar'}</strong></div></aside>
-          <article className="municipalCard"><div className="cityTitle"><div><span>MUNICÍPIO SELECIONADO</span><h3>{municipality}</h3><p>{stateNames[selected]} · {selected}</p></div><span className="statusPill">estrutura pronta</span></div><div className="readiness"><div className="ready"><span>01</span><strong>Geografia</strong><small>Malha IBGE pronta para vínculo</small></div><div className="ready"><span>02</span><strong>Catálogo SUS</strong><small>Rename nacional carregada</small></div><div className="pending"><span>03</span><strong>Dispensação local</strong><small>Requer acesso público à BNAFAR/REMUME</small></div></div><div className="municipalWarning"><strong>Por que não mostramos um número inventado?</strong><p>A BNAFAR consolida estoque e dispensação municipais, mas o portal público descrito pelo Ministério ainda não oferece aqui uma extração aberta e homogênea. O painel separa “previsto na Rename” de “efetivamente disponível”.</p></div></article>
+        <div className="municipalHeader"><div><p className="sectionLabel">ACESSO TERRITORIAL · 5.571 MUNICÍPIOS</p><h2>Da rede potencial<br /><em>ao vazio observado.</em></h2></div><div className="betaTag realTag">DADOS OFICIAIS · CAMADA 0.3</div></div>
+        <div className="accessNational"><div><strong>{accessData.meta.cnesPharmacies.toLocaleString('pt-BR')}</strong><span>farmácias ativas tipo 43 no CNES</span></div><div><strong>{accessData.meta.cnesRate.toLocaleString('pt-BR')}</strong><span>farmácias CNES por 10 mil hab.</span></div><div><strong>{accessData.meta.pfpbCoveragePct.toLocaleString('pt-BR')}%</strong><span>municípios com cobertura PFPB observada*</span></div><div><strong>{accessData.meta.pfpbNoCoverageObserved.toLocaleString('pt-BR')}</strong><span>sem cobertura PFPB observada*</span></div></div>
+        <div className="accessToolbar">
+          <div className="accessSearch"><label htmlFor="municipality-search">Buscar município ou código IBGE</label><input id="municipality-search" value={accessQuery} onChange={e => setAccessQuery(e.target.value)} placeholder="Ex.: Parintins ou 1303403" />{accessResults.length > 0 && <div className="searchResults">{accessResults.map(city => <button key={city.id} onClick={() => chooseMunicipality(city)}><span>{city.name}</span><small>{city.uf} · {city.id}</small></button>)}</div>}</div>
+          <label>Estado<select value={selected} onChange={e => chooseState(e.target.value)}>{Object.entries(stateNames).map(([uf,name]) => <option key={uf} value={uf}>{name} · {uf}</option>)}</select></label>
+          <label>Município<select value={selectedMunicipality.id} onChange={e => chooseMunicipality(accessMunicipalities.find(city => city.id === e.target.value) || selectedMunicipality)}>{cities.map(city => <option value={city.id} key={city.id}>{city.name}</option>)}</select></label>
+          <div className="segmented accessSegmented" role="tablist"><button className={accessView==='profile'?'selected':''} onClick={() => setAccessView('profile')}>Ficha</button><button className={accessView==='gaps'?'selected':''} onClick={() => setAccessView('gaps')}>Vazios</button></div>
         </div>
+
+        {accessView === 'profile' ? <div className="accessProfile">
+          <article className="cityProfile">
+            <div className="cityTitle"><div><span>MUNICÍPIO SELECIONADO · IBGE {selectedMunicipality.id}</span><h3>{selectedMunicipality.name}</h3><p>{stateNames[selectedMunicipality.uf]} · {selectedMunicipality.uf}</p></div><span className="statusPill confidencePill">confiança moderada</span></div>
+            <div className="accessMetrics"><div><span>POPULAÇÃO 2024</span><strong>{selectedMunicipality.population?.toLocaleString('pt-BR') || 'sem estimativa'}</strong><small>SIDRA/IBGE</small></div><div><span>FARMÁCIAS CNES</span><strong>{selectedMunicipality.cnesPharmacies}</strong><small>tipo 43 · ativas</small></div><div><span>TAXA POR 10 MIL</span><strong>{selectedMunicipality.cnesRate?.toLocaleString('pt-BR') ?? 'n/d'}</strong><small>denominador 2024</small></div><div><span>FARMÁCIA POPULAR</span><strong>{selectedMunicipality.pfpbCovered ? 'cobertura observada' : 'não observada'}</strong><small>referência mar/2026*</small></div></div>
+            <div className="distanceGrid"><div className={selectedMunicipality.cnesPharmacies ? 'available' : 'gap'}><span>REDE CNES TIPO 43</span><strong>{selectedMunicipality.cnesPharmacies ? 'presença no município' : selectedMunicipality.nearestCnesKm == null ? 'distância indisponível' : `${selectedMunicipality.nearestCnesKm.toLocaleString('pt-BR')} km`}</strong><p>{selectedMunicipality.cnesPharmacies ? `${selectedMunicipality.cnesPharmacies} ponto(s) cadastrado(s); não confirma dispensação.` : selectedMunicipality.nearestCnesMunicipality ? `Ponto cadastrado mais próximo em ${selectedMunicipality.nearestCnesMunicipality}.` : 'Município sem centróide compatível com o denominador de 2024.'}</p></div><div className={selectedMunicipality.pfpbCovered ? 'available' : 'gap'}><span>COBERTURA FARMÁCIA POPULAR</span><strong>{selectedMunicipality.pfpbCovered ? 'presença observada' : selectedMunicipality.nearestPfpbKm == null ? 'distância indisponível' : `${selectedMunicipality.nearestPfpbKm.toLocaleString('pt-BR')} km`}</strong><p>{selectedMunicipality.pfpbCovered ? 'Município fora da lista de vazios ou com vaga preenchida.' : selectedMunicipality.nearestPfpbMunicipality ? `Cobertura observada mais próxima em ${selectedMunicipality.nearestPfpbMunicipality}.` : 'Município sem centróide compatível com a malha territorial usada.'}</p></div></div>
+            <button className="downloadAccess" onClick={exportAccessCsv}>↓ Baixar ficha em CSV</button>
+          </article>
+          <aside className="benchmarkCard"><p className="sectionLabel">COMPARAÇÃO TERRITORIAL</p><h3>Farmácias CNES<br />por 10 mil habitantes</h3>{[{label:selectedMunicipality.name,value:selectedMunicipality.cnesRate || 0},{label:selectedMunicipality.uf,value:ufAccess.cnesRate},{label:'Brasil',value:accessData.meta.cnesRate}].map(item => <div className="benchmark" key={item.label}><span>{item.label}<b>{item.value.toLocaleString('pt-BR')}</b></span><i><em style={{width:`${item.value/comparisonMax*100}%`}} /></i></div>)}<div className="ufCoverage"><span>COBERTURA PFPB NA UF</span><strong>{ufAccess.pfpbCoveragePct.toLocaleString('pt-BR')}%</strong><small>{ufAccess.pfpbCovered} de {ufAccess.municipalities} municípios</small></div></aside>
+        </div> : <div className="gapPanel">
+          <div className="gapPanelHead"><div><p className="sectionLabel">PRIORIDADE DE INVESTIGAÇÃO · {selected}</p><h3>Municípios sem cobertura PFPB observada</h3></div><label>Ordenar por<select value={gapMetric} onChange={e => setGapMetric(e.target.value as 'population'|'distance')}><option value="population">Maior população</option><option value="distance">Maior distância aproximada</option></select></label></div>
+          <div className="gapTable"><div className="gapHead"><span>Município</span><span>População</span><span>Farmácias CNES</span><span>Até cobertura PFPB*</span><span /></div>{gapRanking.map(city => <button key={city.id} onClick={() => chooseMunicipality(city)}><strong>{city.name}<small>{city.id} · {city.uf}</small></strong><span>{city.population?.toLocaleString('pt-BR') || 'n/d'}</span><span>{city.cnesPharmacies}</span><span>{city.nearestPfpbKm == null ? 'distância indisponível' : `${city.nearestPfpbKm.toLocaleString('pt-BR')} km · ${city.nearestPfpbMunicipality}`}</span><b>→</b></button>)}</div>
+        </div>}
+        <div className="accessCaveat"><strong>*Como interpretar esta camada</strong><p>“Farmácia CNES” significa estabelecimento ativo classificado como tipo 43 — não comprova estoque, vínculo com o SUS ou dispensação. A cobertura do Farmácia Popular é inferida do Anexo I do credenciamento: municípios ausentes da lista ou com vaga preenchida são classificados como cobertos. Distâncias são geodésicas em linha reta a partir de centróides municipais; não representam rota ou tempo de viagem. Estoque e dispensação efetivos permanecem indisponíveis sem abertura homogênea da BNAFAR.</p></div>
       </section>
 
       <section className="enrichmentSection" id="apis">
@@ -218,12 +261,12 @@ export default function Home() {
 
       <section className="methodSection" id="metodologia">
         <div><p className="sectionLabel">MÉTODO REPRODUTÍVEL</p><h2>Quatro camadas,<br />uma trilha de evidências.</h2></div>
-        <div className="methodSteps"><article><span>01</span><h3>Ingestão</h3><p>Arquivos oficiais preservados com URL, data de acesso, versão e checksum.</p><code>source_id · retrieved_at · sha256</code></article><article><span>02</span><h3>Normalização</h3><p>Princípios ativos padronizados sem confundir sal, associação, dose ou apresentação.</p><code>DCB → CATMAT → ATC</code></article><article><span>03</span><h3>Cruzamento</h3><p>CMED e Rename unidos por chave canônica; município ligado pelo geocódigo IBGE.</p><code>ingredient_key · ibge_code</code></article><article><span>04</span><h3>Publicação</h3><p>Cada indicador expõe fonte, unidade, cobertura, transformação e limitações.</p><code>metric_version · caveat_id</code></article></div>
+        <div className="methodSteps"><article><span>01</span><h3>Ingestão</h3><p>Arquivos oficiais preservados com URL, data de acesso, versão e checksum SHA-256.</p><code>source_id · retrieved_at · sha256</code></article><article><span>02</span><h3>Normalização</h3><p>Medicamento, estabelecimento e município recebem chaves canônicas sem apagar a fonte.</p><code>DCB · CATMAT · CNES · IBGE</code></article><article><span>03</span><h3>Cruzamento</h3><p>CNES tipo 43, PFPB e população são unidos pelo código IBGE; taxas preservam o ano do denominador.</p><code>ibge_code · reference_period</code></article><article><span>04</span><h3>Publicação</h3><p>Cada indicador expõe fonte, unidade, cobertura, transformação, confiança e limitações.</p><code>metric_version · caveat_id</code></article></div>
         <div className="academicNote"><span>NOTA DE INTERPRETAÇÃO</span><p>“Mais vendido” significa maior faixa de embalagens informada à CMED — não número de pacientes, prescrições ou doses. Os volumes públicos são apresentados em faixas para princípios ativos. Comparações territoriais só serão publicadas após validação de cobertura e denominador populacional.</p></div>
       </section>
 
       <section className="sourcesSection" id="fontes">
-        <div className="sourcesHeading"><div><p className="sectionLabel">CATÁLOGO DE FONTES</p><h2>Auditável desde a origem.</h2></div><p>Versão do painel <strong>0.2.0 · protótipo acadêmico</strong><br />Atualizado em 24 ago 2026</p></div>
+        <div className="sourcesHeading"><div><p className="sectionLabel">CATÁLOGO DE FONTES</p><h2>Auditável desde a origem.</h2></div><p>Versão do painel <strong>0.3.0 · protótipo acadêmico</strong><br />Atualizado em 24 ago 2026</p></div>
         <div className="sourceTable"><div className="sourceHead"><span>ID</span><span>Fonte</span><span>Responsável</span><span>Granularidade</span><span>Referência</span><span /></div>{sources.map(s => <a href={s.href} target="_blank" rel="noreferrer" key={s.code}><code>{s.code}</code><strong>{s.name}</strong><span>{s.owner}</span><span>{s.grain}</span><span>{s.date}</span><b>↗</b></a>)}</div>
         <div className="auditAlert"><span>!</span><p><strong>Divergência documentada:</strong> a notícia da Anvisa informa 232 empresas, 14.586 apresentações e 1.944 princípios ativos; o PDF do Anuário informa 226, 14.185 e 1.905. O protótipo usa o PDF e mantém a divergência visível para revisão.</p></div>
       </section>

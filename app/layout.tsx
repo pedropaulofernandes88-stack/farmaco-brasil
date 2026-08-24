@@ -8,10 +8,10 @@ const lora = Lora({ variable: '--font-lora', subsets: ['latin'], style: ['italic
 export const metadata: Metadata = {
   metadataBase: new URL('https://farmaco-brasil.pedropaulofernandes8.chatgpt.site'),
   title: 'Fármaco Brasil — Inteligência farmacêutica territorial',
-  description: 'Mapa auditável do mercado de medicamentos e da oferta no SUS por estado e município.',
+  description: 'Mapa auditável do mercado de medicamentos, compras públicas e acesso territorial por estado e município.',
   openGraph: {
     title: 'Fármaco Brasil',
-    description: 'Inteligência farmacêutica territorial: mercado, SUS e evidências em uma base auditável.',
+    description: 'Mercado, compras públicas, CNES, Farmácia Popular e acesso territorial em uma base auditável.',
     images: [{ url: '/og.png', width: 1680, height: 945, alt: 'Fármaco Brasil — inteligência farmacêutica territorial' }],
     locale: 'pt_BR',
     type: 'website',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Fármaco Brasil',
-    description: 'Inteligência farmacêutica territorial: mercado, SUS e evidências em uma base auditável.',
+    description: 'Mercado, compras públicas, CNES, Farmácia Popular e acesso territorial em uma base auditável.',
     images: ['/og.png'],
   },
 };

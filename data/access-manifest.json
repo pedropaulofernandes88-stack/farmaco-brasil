@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-24T16:26:13.420225+00:00",
+  "output": "app/data/access.json",
+  "rules": [
+    "CNES: apenas registros ativos com TP_UNIDADE=43 (FARMACIA).",
+    "PFPB: município fora do Anexo I ou com vaga preenchida é classificado como cobertura observada; a regra é uma inferência documentada.",
+    "Taxas: número de farmácias CNES por 10 mil habitantes, usando população estimada de 2024.",
+    "Distâncias: linha reta; zero significa presença observada no próprio município; não equivale a tempo rodoviário.",
+    "Nenhum indicador confirma estoque ou dispensação efetiva."
+  ],
+  "sources": {
+    "cnes": {
+      "url": "https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip",
+      "file": "cnes_estabelecimentos_csv.zip",
+      "reference": "Cadastro completo disponibilizado pelo Portal de Dados Abertos do SUS",
+      "sha256": "0204e539c0f10fc8d1d3e776600c32371bfc0086fa60240a969cc8bcaba7a0c4",
+      "bytes": 55908319
+    },
+    "pfpb": {
+      "url": "https://www.gov.br/saude/pt-br/composicao/sectics/farmacia-popular/credenciamento/documentacao/anexo-i-lista-de-municipios_atualizada_em_06-03-2026.xlsx/@@download/file",
+      "file": "pfpb_municipios_vagas_2026.xlsx",
+      "reference": "Anexo I do credenciamento do PFPB, atualizado em 06/03/2026",
+      "sha256": "daf472e7b4cb149e1272395054c99e8881e0e09b90feff77e9ede9c8fedaec82",
+      "bytes": 70277
+    },
+    "population": {
+      "url": "https://apisidra.ibge.gov.br/values/t/6579/n6/all/v/9324/p/2024?formato=json",
+      "file": "ibge_population_2024.json",
+      "reference": "SIDRA 6579, variável 9324, população residente estimada em 2024",
+      "sha256": "a2b62956c5a7070606e7d323208a9a305e8a3b37799150462fe8c5de639f386d",
+      "bytes": 1035032
+    },
+    "geometry": {
+      "url": "https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&qualidade=minima&intrarregiao=municipio",
+      "file": "ibge_municipios_min.geojson",
+      "reference": "API de Malhas Territoriais do IBGE, qualidade mínima",
+      "sha256": "5efffedf8772dc8654322affafac4e3e8b001839e7c2af5cab4eb1094dcd6240",
+      "bytes": 3605638
+    }
+  }
+}
